@@ -1,42 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# <font size="6">**Machine Learning Classification Model Analysis**</font>
-# 
-# <font size="3">Developed by **Ivan Manurung**, a Data Strategist and Machine Learning Analyst</font>
-# 
-# 
-# **Case:**
-# <br>
-# Apprentice Chef, Inc. is an innovative company with a unique spin on cooking at home.
-# Developed for the busy professional that has little to no skills in the kitchen, they offer a wide
-# selection of daily-prepared gourmet meals delivered directly to your door. Each meal set takes
-# at most 30 minutes to finish cooking at home and also comes with Apprentice Chef's awardwinning
-# disposable cookware (i.e. pots, pans, baking trays, and utensils), allowing for fast and
-# easy cleanup. Ordering meals is very easy given their user-friendly online platform and mobile
-# app.
-# 
-# **Challenge:** 
-# <br>
-# In an effort to diversify their revenue stream, Apprentice Chef, Inc. has launched Halfway There,
-# a cross-selling promotion where subscribers receive a half bottle of wine from a local California
-# vineyard every Wednesday (halfway through the work week). The executives at Apprentice Chef
-# also believe this endeavor will create a competitive advantage based on its unique product
-# offering of hard to find local wines.
-# Halfway There has been exclusively offered to all of the customers in the dataset you received,
-# and the executives would like to promote this service to a wider audience. They have tasked
-# you with analyzing their data, developing your top insights, and building a machine
-# 
-# **Steps:**
-# 1. Exploratory data analysis
-# 2. Feature treatment and engineering
-# 3. Utilizing appropriate modeling techniques
-
-# <font size="4">**Part I: Preparation and Exploration**</font>
-
-# In[101]:
-
-
 # Importing libraries
 import pandas as pd
 import numpy as np
@@ -71,15 +35,9 @@ chef = pd.read_excel('Apprentice_Chef_Dataset.xlsx')
 chef = chef.drop(labels = ['NAME', 'FIRST_NAME'],
                  axis = 1)
 
-
-# In[102]:
-
-
 # Check dataset by showing random row
 chef.sample(n=5)
 
-
-# In[103]:
 
 
 # Creating a placeholder list
@@ -173,20 +131,15 @@ one_hot_domain_group = pd.get_dummies(chef['domain_group'])
 chef = chef.join([one_hot_domain_group])
 
 
-# <br>
-# By visualizing the weight of 3 email domain groups to show us an estimate of mean value of each attributes.We can see that professional and personal domain email group are dominating. So we can eliminate junk email as we want to avoid having Nan or infinity values by having too many dummy variables.
-# <br>
 
-# In[104]:
+# By visualizing the weight of 3 email domain groups to show us an estimate of mean value of each attributes.We can see that professional and personal domain email group are dominating. So we can eliminate junk email as we want to avoid having Nan or infinity values by having too many dummy variables.
+
 
 
 # Plotting email domain group
 sns.barplot(x = 'domain_group', 
             y = 'CROSS_SELL_SUCCESS', 
             data = chef)
-
-
-# In[105]:
 
 
 # Visualizing correlation using heatmap
@@ -208,12 +161,6 @@ plt.ylim(bottom, top)    # Updating the ylim(bottom, top) values
 
 plt.show()
 
-
-# <br><br><font size="4">**Part II: Feature Engineering**</font>
-# - **Correlation matrix.** We can see that some variables are significantly correlated one to another. We are now combining two variables to create a new feature that will be useful to support our further predictive model.
-# - **Treshold based features.** Other technique for feature engineering is by setting a new treshold from current dataset and extract new features. To be able to do that, we need to see the shape of the data distribution. 
-
-# In[106]:
 
 
 ####################################################################
@@ -275,9 +222,6 @@ feature_10 = chef['REFRIGERATED_LOCKER'] * chef['PACKAGE_LOCKER']
 feature_10_df = pd.DataFrame(feature_10)
 feature_10_df.columns = ['NEW_LOCKERS_BOTH']
 chef = pd.concat([chef, feature_10_df['NEW_LOCKERS_BOTH']], axis = 1)
-
-
-# In[107]:
 
 
 #########################################################################
@@ -490,8 +434,6 @@ sns.distplot(chef['AVG_CLICKS_PER_VISIT'],
 plt.xlabel('Avg Clicks Per Visit')
 
 
-# In[108]:
-
 
 # Customers who follow recommendation picture
 chef['NEW_FOLLOWED_RECOMMENDATIONS_PCT_LO'] = 0 # Preparing placeholder
@@ -578,7 +520,6 @@ for index, val in chef.iterrows():
 
 # Saving all new features into new dataset before moving forward to next step
 
-# In[109]:
 
 
 # Saving results with all new features
@@ -590,8 +531,6 @@ chef.to_excel('Apprentice_Chef_Dataset_features_rich.xlsx',
 # - Declaring explanatory variables as **chef_full** and **chef_target** as target variable
 # - Building OLS model to select significant features based on p-value
 # - Preparing **training and testing** sets with stratification as this is classification model
-
-# In[110]:
 
 
 # Loading previously stored dataset
@@ -606,8 +545,6 @@ chef_full = chef.drop(labels = 'CROSS_SELL_SUCCESS', axis = 1)
 chef_target = chef.loc[ : , 'CROSS_SELL_SUCCESS']
 
 
-# In[112]:
-
 
 # Looping explanatory variables before building logistic regression
 for val in chef_full:
@@ -616,7 +553,6 @@ for val in chef_full:
 
 # **i. OLS Model using with full features**
 
-# In[113]:
 
 
 # Computing full model with all explanatory variables
@@ -672,8 +608,6 @@ results_full.summary()
 
 
 # **ii. OLS Model after removing insignificant variables based on p-value and coefficient**
-
-# In[114]:
 
 
 # Computing final model with selected variables
@@ -751,7 +685,6 @@ chef_features = chef.loc[ : , x_variables_final]
 # - Describe the performance of the classification model with **confusion matrix**
 # - Calculate **classification report** contains of precision, recall, and F1 score for each class
 
-# In[130]:
 
 
 # optimal_neighbors
@@ -846,7 +779,6 @@ show_viz      : display or surpress k-neigbors visualization, default True
     return test_accuracy.index(max(test_accuracy))+1
 
 
-# In[131]:
 
 
 # Determining the optimal number of neighbors
@@ -856,7 +788,6 @@ opt_neighbors = optimal_neighbors(X_data = X_train,
 
 # We can observe above that we get maximum testing accuracy for **n_neighbor = 8**. So lets create a KNeighborsClassifier with number of neighbors as 8.
 
-# In[132]:
 
 
 # Setup a knn classifier with optimum k neighbors
@@ -881,8 +812,6 @@ print('Accuracy score KNN (training):', knn_fit.score(X_train, y_train).round(3)
 print('Accuracy score KNN (testing):', knn_fit.score(X_test, y_test).round(3))
 print("Area under ROC curve KNN = {:0.2f}".format(roc_auc_knn))
 
-
-# In[134]:
 
 
 # Setup a StandardScaler model
@@ -925,8 +854,6 @@ print('Scaled Accuracy score KNN (testing):', knn_fit_scaled.score(X_test_scaled
 print("Scaled Area under ROC curve KNN = {:0.2f}".format(roc_auc_knn_scaled))
 
 
-# In[135]:
-
 
 # In case of classifier like KNN the parameter to be tuned is n_neighbors
 param_grid = {'n_neighbors':np.arange(1,50)}
@@ -957,8 +884,6 @@ print("Tuned Accuracy score KNN (testing):", knn_tuned_est.score(X_test_scaled, 
 print("Tuned Training AUC KNN:", knn_tuned_cv.best_score_.round(3))
 
 
-# In[136]:
-
 
 # Get confusion matrix
 print("Confusion Matrix:")
@@ -968,9 +893,6 @@ print(confusion_matrix(y_test_scaled,
 # Get classification report
 print(classification_report(y_test_scaled, 
                             knn_tuned_pred))
-
-
-# In[137]:
 
 
 # Print the summary score results of all Gradient Boosting Classifier Model
@@ -1001,16 +923,3 @@ print("Tuned Accuracy score KNN (testing):", knn_tuned_est.score(X_test_scaled, 
 print("Tuned Training AUC KNN:", knn_tuned_cv.best_score_.round(3))
 print()
 
-
-# <font size="2">**Summary KNN Classifier Model**</font>
-# - For the **Tuned KNN Classifier model** with number of **neighbors as 42** achieves THE BEST training and testing score/accuracy of **0.757 and 0.754**.
-# - Tuned KNN Classifier model l on training subset results in **average precision, recall, and f1-scores** on test subset were **0.74, 0.75, and 0.74** respectively, with **area under ROC (AUC) was 0.759**
-
-# <br><font size="5">**Business Insights:**</font><br>
-# After analyzing the data, we can understand that most of the customers are being influenced to purchase meals after seeing the recommendation pictures. On average, 35% of orders are being made driven by the meal recommendation. However, we need increase the rate because based on the collinearity matrix, customer who are not likely to order based on the recommendation meal, they won’t subscribe to Halfway-There service. We could therefore conclude that the meals that are being recommended to them are not match with their meal preference.
-# Secondly, it is quite surprising for customers who made more order on the Apprentice Chef platform, they are not necessarily willing to subscribe to Halfway-There service. Although this is important to increase revenue, we have to be aware that new customers might be more interested to subscribe than people who have been using the platform longer.
-# 
-# 
-# <br><font size="5">**Recommendation:**</font><br>
-# Meal recommendation is an important feature for Apprentice Chef customers. Based on those findings, there is one key action that might be helpful to drive customers to subscribe while at the same time can drive revenue higher as well. Since we have professional email, family name, and historical meal purchase data, we can group the customers based on those characteristic and create meal recommendation for couples, family, or coworker. By having this, we can increase the size of order which directly lead to revenue increased. Once we get more customers purchase using the meal recommendation, we are confident that more customers will subscribe to Halfway-There.
-# AUC Score: 0.97
